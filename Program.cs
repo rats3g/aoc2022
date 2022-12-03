@@ -153,7 +153,7 @@ void CreateSolutionClass(DirectoryInfo directoryInfo, int year, int day)
                 return "unsolved";
             {rCurly}
 
-        public async Task<string> SolvePartTwo(string inputFile)
+            public async Task<string> SolvePartTwo(string inputFile)
             {lCurly}
                 return "unsolved";
             {rCurly}
