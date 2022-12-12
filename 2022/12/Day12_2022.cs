@@ -73,6 +73,8 @@ internal class Day12_2022 : ISolution
         return nodes;
     }
 
+    // Djikstra's shortest path algorithm (potential improvement using A*)
+    // TODO: Improve performance using a priority queue (Fibonacci heap or Brodal queue offer optimal implementations)
     private static Dictionary<INode, int> ShortestPath(IEnumerable<INode> nodes, INode start)
     {
         var distance = new Dictionary<INode, int>();
