@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 namespace AdventOfCode;
 
 internal class Day12_2022 : ISolution
@@ -5,15 +7,31 @@ internal class Day12_2022 : ISolution
     public async Task<string> SolvePartOne(string inputFile)
     {
         var lines = await File.ReadAllLinesAsync(inputFile);
-        
-        var nodes = new Dictionary<(int, int), Node>();
+
+        var nodes = GenerateGraph(lines);
 
         Node? start = null;
         Node? end = null;
         for (var i = 0; i < lines.Length; i++)
         {
             for (var j = 0; j < lines[i].Length; j++)
-            {                
+            {
+                if (lines[i][j] == 'S') start = nodes[(i, j)];
+                if (lines[i][j] == 'E') end = nodes[(i, j)];
+            }
+        }        
+
+        return ShortestPath(nodes.Values, end!)[start!].ToString();
+    }
+
+    private static Dictionary<(int, int), Node> GenerateGraph(string[] lines)
+    {
+        var nodes = new Dictionary<(int, int), Node>();
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            for (var j = 0; j < lines[i].Length; j++)
+            {
                 var height = lines[i][j] switch
                 {
                     'S' => 'a',
@@ -23,8 +41,6 @@ internal class Day12_2022 : ISolution
 
                 nodes[(i, j)] = new Node(height);
 
-                if (lines[i][j] == 'S') start = nodes[(i, j)];
-                if (lines[i][j] == 'E') end = nodes[(i, j)];
             }
         }
 
@@ -34,39 +50,37 @@ internal class Day12_2022 : ISolution
             {
                 if (i > 0 && nodes[(i - 1, j)].Height - nodes[(i, j)].Height < 2)
                 {
-                    nodes[(i, j)].AddNeighbor(nodes[(i - 1, j)]);
+                    nodes[(i - 1, j)].AddNeighbor(nodes[(i, j)]);
                 }
 
                 if (i < lines.Length - 1 && nodes[(i + 1, j)].Height - nodes[(i, j)].Height < 2)
                 {
-                    nodes[(i, j)].AddNeighbor(nodes[(i + 1, j)]);
+                    nodes[(i + 1, j)].AddNeighbor(nodes[(i, j)]);
                 }
 
                 if (j > 0 && nodes[(i, j - 1)].Height - nodes[(i, j)].Height < 2)
                 {
-                    nodes[(i, j)].AddNeighbor(nodes[(i, j - 1)]);
+                    nodes[(i, j - 1)].AddNeighbor(nodes[(i, j)]);
                 }
 
                 if (j < lines[i].Length - 1 && nodes[(i, j + 1)].Height - nodes[(i, j)].Height < 2)
                 {
-                    nodes[(i, j)].AddNeighbor(nodes[(i, j + 1)]);
+                    nodes[(i, j + 1)].AddNeighbor(nodes[(i, j)]);
                 }
             }
         }
 
-        return ShortestPath(nodes.Values, start!, end!).ToString();
+        return nodes;
     }
 
-    private int ShortestPath(IEnumerable<INode> nodes, INode start, INode end)
+    private static Dictionary<INode, int> ShortestPath(IEnumerable<INode> nodes, INode start)
     {
         var distance = new Dictionary<INode, int>();
-        var previous = new Dictionary<INode, INode?>();
         var remaining = nodes.ToList();
 
         foreach (var node in nodes)
         {
             distance[node] = int.MaxValue;
-            previous[node] = null;
         }
 
         distance[start] = 0;
@@ -82,16 +96,31 @@ internal class Day12_2022 : ISolution
                 if (newDistance < distance[neighbor])
                 {
                     distance[neighbor] = newDistance;
-                    previous[neighbor] = shortest;
                 }
             }
         }
 
-        return distance[end];
+        return distance;
     }
 
     public async Task<string> SolvePartTwo(string inputFile)
     {
-        return "unsolved";
+        var lines = await File.ReadAllLinesAsync(inputFile);
+
+        var nodes = GenerateGraph(lines);
+
+        var startingNodes = new List<INode>();
+        Node? end = null;
+        for (var i = 0; i < lines.Length; i++)
+        {
+            for (var j = 0; j < lines[i].Length; j++)
+            {
+                if (lines[i][j] == 'S' || lines[i][j] == 'a') startingNodes.Add(nodes[(i, j)]);
+                if (lines[i][j] == 'E') end = nodes[(i, j)];
+            }
+        }
+
+        var distances = ShortestPath(nodes.Values, end!);
+        return startingNodes.Where(start => distances[start] > 0).Min(start => distances[start]).ToString();
     }
 }
