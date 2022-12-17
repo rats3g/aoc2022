@@ -34,7 +34,7 @@ internal class Day16_2022 : ISolution
         }
 
         var remaining = new HashSet<Valve>(valves.Values.Where(valve => valve.flow != 0));
-        return MaxFlow(remaining, idToValve[0], 30).ToString();
+        return MaxFlow(remaining, idToValve[0], 0, 30).ToString();
     }
 
     private int MaxFlow(ISet<Valve> remaining, Valve valve, int flow, int time)
