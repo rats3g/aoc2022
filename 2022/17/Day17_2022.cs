@@ -85,7 +85,7 @@ internal class Day17_2022 : ISolution
 
         var i = 0;
         var first = true;
-        foreach (var shape in GetShapes(world).Take(1000000000000))
+        foreach (var shape in GetShapes(world).Take(2022))
         {
             if (i == 1742 && first) {
                 directions.MoveNext();
