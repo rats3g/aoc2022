@@ -3,5 +3,7 @@ namespace AdventOfCode;
 internal enum Direction
 {
     Left,
-    Right
+    Right,
+    Up,
+    Down
 }
